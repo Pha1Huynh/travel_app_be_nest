@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-
+import { UserService } from 'src/user/user.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
+
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.userService.findOne(email);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async login(user: any) {
+    const payload = { email: user.email, userId: user.id };
+    return {
+      access_token: this.jwtService.sign(payload, {
+        secret: process.env.ACCESS_TOKEN_SECRET_KEY,
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRED,
+      }),
+      refresh_token: this.jwtService.sign(payload, {
+        secret: process.env.REFRESH_TOKEN_SECRET_KEY,
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRED,
+      }),
+    };
   }
 }

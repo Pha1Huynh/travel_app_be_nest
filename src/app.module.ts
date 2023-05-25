@@ -4,10 +4,14 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     UserModule,
     AuthModule,
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -16,7 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       password: '123456',
       database: 'travelapp',
       synchronize: false,
-      logging: true,
+      logging: false,
 
       entities: ['dist/**/*.entity.js'],
       migrations: ['dist/src/migrations/*{.ts,.js}'],

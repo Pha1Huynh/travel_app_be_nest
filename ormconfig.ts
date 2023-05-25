@@ -7,7 +7,7 @@ export const AppDataSource = new DataSource({
   password: '123456',
   database: 'travelapp',
   synchronize: false,
-  logging: true,
+  logging: false,
 
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/src/migrations/*{.ts,.js}'],
